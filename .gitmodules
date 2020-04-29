@@ -4,3 +4,6 @@
 [submodule "Assets/EzmidiUnity"]
 	path = Assets/EzmidiUnity
 	url = https://github.com/matthewcpp/EzmidiUnity.git
+[submodule "Assets/TinySoundFontUnity"]
+	path = Assets/TinySoundFontUnity
+	url = https://github.com/matthewcpp/TinySoundFontUnity.git
