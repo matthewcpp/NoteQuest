@@ -1,3 +1,6 @@
 [submodule "Assets/ABCUnity"]
 	path = Assets/ABCUnity
 	url = https://github.com/matthewcpp/ABCUnity.git
+[submodule "Assets/EzmidiUnity"]
+	path = Assets/EzmidiUnity
+	url = https://github.com/matthewcpp/EzmidiUnity.git
