@@ -170,7 +170,6 @@ namespace NoteQuest
                 activeObject = null;
                 StartCoroutine(SpawnNoteAfter(fadeOutTime));
             }
-                
         }
 
         IEnumerator SpawnNoteAfter(float time)

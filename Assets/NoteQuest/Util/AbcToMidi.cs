@@ -5,7 +5,7 @@ namespace NoteQuest
 {
     static class AbcToMidi
     {
-        public static bool Convert(ABC.Duration item, HashSet<int> midiNotes)
+        public static bool Convert(ABC.Duration item, ICollection<int> midiNotes)
         {
             midiNotes.Clear();
 
