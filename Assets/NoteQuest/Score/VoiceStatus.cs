@@ -77,7 +77,6 @@ namespace NoteQuest
             }
         }
 
-        public bool isRest { get { return beatNote != null && beatNote.type == ABC.Item.Type.Rest; } }
         public bool isReadyForNextBeat { get { return remainingNotes.Count == 0 && beatNoteIndex == beat.items.Count; } }
     }
 }
