@@ -37,6 +37,8 @@ namespace NoteQuest
                 voiceStatuses.Add(voiceStatus);
                 AddAllowedNotes(voiceStatus);
             }
+
+            UpdateStatus();
         }
 
         private void Start()
@@ -51,26 +53,28 @@ namespace NoteQuest
 
             midi.NoteOn += OnKeyDown;
 
-            //layout.LoadString("M:C\nL:1/4\nC[CEG]C[CEG]|");
             layout.LoadStream(File.OpenRead("D:/temp/notequest.abc"));
         }
 
-        bool readyForNextBeat = false;
-
-        private void Update()
+        private void UpdateStatus()
         {
-            if (ReadyForNextBeat())
+            foreach (var voiceStatus in voiceStatuses)
             {
-                if (currentBeat < beatCount)
+                if (voiceStatus.remainingNotes.Count == 0)
+                    AdvanceBeatItem(voiceStatus);
+            }
+
+            while (ReadyForNextBeat())
+            {
+                if (currentBeat < beatsInMeasure)
                     AdvanceBeat();
                 else
                     AdvanceMeasure();
-
-                readyForNextBeat = false;
             }
         }
 
-        const int beatCount = 4;
+        // TODO: Read Time Signature from layout
+        const int beatsInMeasure = 4;
         int currentMeasure = 0;
         int currentBeat = 1;
         bool complete = false;
@@ -92,10 +96,6 @@ namespace NoteQuest
                     if (voiceStatus.remainingNotes.Count == 0)
                     {
                         layout.SetItemColor(voiceStatus.beatNote, Color.green);
-
-                        RemoveAllowedNotes(voiceStatus);
-                        voiceStatus.NextBeatItem();
-                        AddAllowedNotes(voiceStatus);
                     }
                 }
             }
@@ -109,10 +109,15 @@ namespace NoteQuest
                         layout.SetItemColor(voiceStatus.beatNote, Color.yellow);
                 }
             }
+
+            UpdateStatus();
         }
 
         bool ReadyForNextBeat()
         {
+            if (complete)
+                return false;
+
             foreach (var voiceStatus in voiceStatuses)
             {
                 if (!voiceStatus.isReadyForNextBeat)
@@ -153,6 +158,14 @@ namespace NoteQuest
                 voiceStatus.NextBeat(currentBeat);
                 AddAllowedNotes(voiceStatus);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void AdvanceBeatItem(VoiceStatus voiceStatus)
+        {
+            RemoveAllowedNotes(voiceStatus);
+            voiceStatus.NextBeatItem();
+            AddAllowedNotes(voiceStatus);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
