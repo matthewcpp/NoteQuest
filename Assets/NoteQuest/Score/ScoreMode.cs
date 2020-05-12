@@ -18,12 +18,24 @@ namespace NoteQuest
         // contains the notes that are allowed to be down while still advancing to the next beat item
         HashSet<int> allowedNotes = new HashSet<int>();
 
+        public int streak { get; private set; } = 0;
+
         void Awake()
         {
             var layoutObj = GameObject.Instantiate(layoutPrefab, this.transform);
             layout = layoutObj.GetComponent<ABCUnity.Layout>();
 
             layout.onLoaded += OnTuneLoaded;
+        }
+
+        public ABC.Tune tune { get { return layout.tune; } }
+
+        public ABC.Item GetActiveVoiceItem(int index)
+        {
+            if (voiceStatuses != null)
+                return voiceStatuses[index].beatNote;
+            else
+                return null;
         }
 
         private void OnTuneLoaded(ABC.Tune tune)
@@ -47,13 +59,14 @@ namespace NoteQuest
             var aspect = Camera.main.aspect;
             var orthoWidth = (orthoSize * 2.0f) * aspect;
 
+            layout.layoutScale = 0.25f;
             var layoutTransform = layout.GetComponent<RectTransform>();
             layoutTransform.position = new Vector3(0.1f, orthoSize - 1.0f, 0.0f);
             layoutTransform.sizeDelta = new Vector2(orthoWidth, orthoSize * 2.0f - 0.2f);
 
             midi.NoteOn += OnKeyDown;
 
-            layout.LoadStream(File.OpenRead("D:/temp/notequest.abc"));
+            layout.LoadStream(File.OpenRead("D:/temp/Chord Crash Course/01 Right Hand Climb.abc"));
         }
 
         private void UpdateStatus()
@@ -71,6 +84,29 @@ namespace NoteQuest
                 else
                     AdvanceMeasure();
             }
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.R))
+                ResetScore();
+        }
+
+        public void ResetScore()
+        {
+            allowedNotes.Clear();
+            complete = false;
+            currentMeasure = 0;
+            currentBeat = 1;
+            streak = 0;
+
+            foreach (var voiceStatus in voiceStatuses)
+            {
+                voiceStatus.NextMeasure(currentMeasure);
+                AddAllowedNotes(voiceStatus);
+            }
+
+            layout.ResetItemColors();
         }
 
         // TODO: Read Time Signature from layout
@@ -96,6 +132,7 @@ namespace NoteQuest
                     if (voiceStatus.remainingNotes.Count == 0)
                     {
                         layout.SetItemColor(voiceStatus.beatNote, Color.green);
+                        streak += 1;
                     }
                 }
             }
@@ -106,7 +143,11 @@ namespace NoteQuest
                 foreach (var voiceStatus in voiceStatuses)
                 {
                     if (voiceStatus.beatNote != null)
+                    {
                         layout.SetItemColor(voiceStatus.beatNote, Color.yellow);
+                        streak = 0;
+                    }
+                        
                 }
             }
 
