@@ -14,15 +14,21 @@ namespace NoteQuest
     {
         [SerializeField] TextMeshProUGUI noteText;
         [SerializeField] TextMeshProUGUI activeNotes;
-        [SerializeField] ScoreMode scoreMode;
         [SerializeField] EzMidi.Connection midi;
         [SerializeField] Streak streak;
+
+        public ScoreMode scoreMode;
 
         private void Update()
         {
             UpdateNoteText();
             UpdateActiveNotes();
             streak.count = scoreMode.streak;
+        }
+
+        public void ShowScore(bool show)
+        {
+            scoreMode.gameObject.SetActive(show);
         }
 
         private void UpdateNoteText()

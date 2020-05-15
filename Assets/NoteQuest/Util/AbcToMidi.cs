@@ -9,6 +9,9 @@ namespace NoteQuest
         {
             midiNotes.Clear();
 
+            if (item == null)
+                return false;
+
             switch (item.type)
             {
                 case ABC.Item.Type.Note:

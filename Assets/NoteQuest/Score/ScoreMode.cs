@@ -11,7 +11,7 @@ namespace NoteQuest
         [SerializeField] GameObject layoutPrefab;
         [SerializeField] EzMidi.Connection midi;
 
-        ABCUnity.Layout layout;
+        public ABCUnity.Layout layout { get; private set; }
 
         List<VoiceStatus> voiceStatuses;
 
@@ -38,6 +38,27 @@ namespace NoteQuest
                 return null;
         }
 
+        #region MonoBehaviour Events
+
+        private void Start()
+        {
+            UpdateLayout();
+            midi.NoteOn += OnKeyDown;
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.R))
+                ResetScore();
+        }
+
+        private void OnEnable()
+        {
+            UpdateLayout();
+        }
+
+        #endregion
+
         private void OnTuneLoaded(ABC.Tune tune)
         {
             voiceStatuses = new List<VoiceStatus>();
@@ -53,7 +74,7 @@ namespace NoteQuest
             UpdateStatus();
         }
 
-        private void Start()
+        void UpdateLayout()
         {
             var orthoSize = Camera.main.orthographicSize;
             var aspect = Camera.main.aspect;
@@ -63,10 +84,6 @@ namespace NoteQuest
             var layoutTransform = layout.GetComponent<RectTransform>();
             layoutTransform.position = new Vector3(0.1f, orthoSize - 1.0f, 0.0f);
             layoutTransform.sizeDelta = new Vector2(orthoWidth, orthoSize * 2.0f - 0.2f);
-
-            midi.NoteOn += OnKeyDown;
-
-            layout.LoadStream(File.OpenRead("D:/temp/Chord Crash Course/01 Right Hand Climb.abc"));
         }
 
         private void UpdateStatus()
@@ -84,12 +101,6 @@ namespace NoteQuest
                 else
                     AdvanceMeasure();
             }
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.R))
-                ResetScore();
         }
 
         public void ResetScore()
