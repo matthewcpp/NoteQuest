@@ -8,11 +8,11 @@ namespace NoteQuest
 {
     class VoiceStatus
     {
-        public ABCUnity.BeatAlignment alignment { get; }
+        public ABCUnity.Alignment alignment { get; }
 
-        private ABCUnity.BeatAlignment.MeasureInfo measure;
+        private ABCUnity.Alignment.Measure measure;
 
-        private ABCUnity.BeatAlignment.BeatItem beat;
+        private ABCUnity.Alignment.Beat beat;
         public int beatItemIndex { get; private set; } = 0;
 
 
@@ -24,7 +24,7 @@ namespace NoteQuest
         public List<int> allNotes { get; } = new List<int>();
 
 
-        public VoiceStatus(ABCUnity.BeatAlignment alignment)
+        public VoiceStatus(ABCUnity.Alignment alignment)
         {
             this.alignment = alignment;
         }
@@ -33,7 +33,7 @@ namespace NoteQuest
         {
             beatItemIndex = 0;
             measure = alignment.measures[measureIndex];
-            beat = measure.beatItems[beatItemIndex];
+            beat = measure.beats[beatItemIndex];
             NextBeat(1);
         }
 
@@ -43,14 +43,14 @@ namespace NoteQuest
         /// </summary>
         public void NextBeat(int currentBeat)
         {
-            if (beatItemIndex == measure.beatItems.Count)
+            if (beatItemIndex == measure.beats.Count)
                 return;
 
             // if we started a new beat then populate the notes and beat item we need
-            if (measure.beatItems[beatItemIndex].beatStart == currentBeat)
+            if (measure.beats[beatItemIndex].beatStart == currentBeat)
             {
-                beat = measure.beatItems[beatItemIndex];
-                beatItemIndex = Math.Min(beatItemIndex + 1, measure.beatItems.Count);
+                beat = measure.beats[beatItemIndex];
+                beatItemIndex = Math.Min(beatItemIndex + 1, measure.beats.Count);
                 beatNoteIndex = -1;
                 NextBeatItem();
             }
@@ -69,7 +69,7 @@ namespace NoteQuest
                 remainingNotes.Clear();
                 allNotes.Clear();
 
-                beatNote = beat.items[beatNoteIndex];
+                beatNote = beat.items[beatNoteIndex].item;
                 AbcToMidi.Convert(beatNote as ABC.Duration, allNotes);
 
                 foreach (var note in allNotes)
