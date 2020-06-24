@@ -69,7 +69,7 @@ namespace NoteQuest
                 remainingNotes.Clear();
                 allNotes.Clear();
 
-                beatNote = beat.items[beatNoteIndex].item;
+                beatNote = beat.items[beatNoteIndex];
                 AbcToMidi.Convert(beatNote as ABC.Duration, allNotes);
 
                 foreach (var note in allNotes)
