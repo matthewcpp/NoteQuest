@@ -59,8 +59,9 @@ namespace NoteQuest
             { ABC.Clef.Bass, new PitchMinMax(ABC.Pitch.C2, ABC.Pitch.C4)},
         };
 
+        const float defaultSecondsToAnswer = 3.0f;
         public float secondsToAnswer { get => _secondsToAnswer; set { SetSecondsToAnswer(value); } }
-        private float _secondsToAnswer = 2.0f;
+        private float _secondsToAnswer = defaultSecondsToAnswer;
         private void SetSecondsToAnswer(float time)
         {
             _secondsToAnswer = time;
@@ -69,10 +70,26 @@ namespace NoteQuest
 
         public ABC.Duration currentItem { get; private set; }
 
-        private void Start()
+        void Start()
         {
-            secondsToAnswer = 2.0f;
-            style = Style.Scrolling;
+            style = Style.Static;
+            ResetArcade();
+        }
+
+        void OnDisable()
+        {
+            midi.NoteOn -= OnKeyDown;
+        }
+
+        public void ResetArcade()
+        {
+            currentItem = null;
+            total = 0;
+            corret = 0;
+            streak = 0;
+
+            arcadeStaff.ResetStaff();
+            secondsToAnswer = defaultSecondsToAnswer;
 
             arcadeStaff.onShredNote += OnShredNote;
             activeObject = arcadeStaff.SpawnNote(GetNextNote(), Vector3.left);

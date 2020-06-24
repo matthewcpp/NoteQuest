@@ -53,6 +53,19 @@ namespace NoteQuest
         {
             arcadeMode.secondsToAnswer = value;
         }
+
+        public void OnScrollingChange(bool scrollingEnabled)
+        {
+            var speedSlider = transform.Find("Speed").GetComponent<Slider>();
+            var toggle = transform.Find("ScrollingEnabled").GetComponent<Toggle>();
+
+            var enabled = toggle.isOn;
+            speedSlider.value = 3.0f;
+            speedSlider.gameObject.SetActive(enabled);
+            
+            arcadeMode.style = enabled ? ArcadeMode.Style.Scrolling : ArcadeMode.Style.Static;
+            arcadeMode.ResetArcade();
+        }
     }
 
 }

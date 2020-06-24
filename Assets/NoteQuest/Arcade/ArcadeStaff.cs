@@ -44,6 +44,17 @@ namespace NoteQuest
 
         public float shredPos { get; set; } = 1.5f;
 
+        public void ResetStaff()
+        {
+            foreach (var activeNote in activeNotes)
+                GameObject.Destroy(activeNote.Key);
+
+            activeNotes.Clear();
+            fadingNotes.Clear();
+            completedFades.Clear();
+            notesToShred.Clear();
+        }
+
         void Awake()
         {
             staff = new ABCUnity.CustomStaff(this.gameObject, spriteAtlas, textPrefab);
