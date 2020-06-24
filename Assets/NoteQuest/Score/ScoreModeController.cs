@@ -10,18 +10,14 @@ namespace NoteQuest
 {
     public class ScoreModeController : MonoBehaviour
     {
-        [SerializeField] GameObject scoreModePrefab;
-        [SerializeField] GameObject scorePickerPrefab;
-        [SerializeField] GameObject layoutPrefab;
-
         TextMeshProUGUI noteText;
         TextMeshProUGUI titleText;
         TextMeshProUGUI activeNotes;
 
         EzMidi.Connection midi;
-        GameObject filePicker;
-        GameObject scoreMode;
-        ABCUnity.Layout layout;
+        [SerializeField] GameObject filePicker;
+        [SerializeField] GameObject scoreMode;
+        [SerializeField] ABCUnity.Layout layout;
         ScoreStatus scoreStatus;
 
         enum State { Initial, Picker, Score}
@@ -29,7 +25,8 @@ namespace NoteQuest
 
         void Awake()
         {
-            InitFilePicker();
+
+            InitPicker();
             InitScoreMode();
 
             ShowFilePicker();
@@ -55,23 +52,25 @@ namespace NoteQuest
             activeState = State.Picker;
         }
 
-        private void InitFilePicker()
+        private void ReturnToMainMenu()
         {
-            if (filePicker == null)
-            {
-                filePicker = GameObject.Instantiate(scorePickerPrefab, this.transform);
-                var picker = filePicker.GetComponent<FileSystemScorePicker>();
-                picker.selection += OnScoreSelected;
-            }
+            this.gameObject.SetActive(false);
+        }
+
+        private void InitPicker()
+        {
+            var picker = filePicker.GetComponent<FileSystemScorePicker>();
+            picker.selection += OnScoreSelected;
+
+            var eventTrigger = picker.transform.Find("Back").GetComponent<EventTrigger>();
+            EventTrigger.Entry entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerClick;
+            entry.callback.AddListener((data) => { ReturnToMainMenu(); });
+            eventTrigger.triggers.Add(entry);
         }
 
         private void InitScoreMode()
         {
-            if (scoreMode != null)
-                return;
-
-            scoreMode = GameObject.Instantiate(scoreModePrefab, this.transform);
-
             var scoreModeTransform = scoreMode.transform;
             noteText = scoreModeTransform.Find("CurrentNotes").GetComponent<TextMeshProUGUI>();
             activeNotes = scoreModeTransform.Find("ActiveNotes").GetComponent<TextMeshProUGUI>();
@@ -88,9 +87,6 @@ namespace NoteQuest
             entry.eventID = EventTriggerType.PointerClick;
             entry.callback.AddListener((data) => { ShowFilePicker(); });
             eventTrigger.triggers.Add(entry);
-
-            var layoutObj = GameObject.Instantiate(layoutPrefab, this.transform);
-            layout = layoutObj.GetComponent<ABCUnity.Layout>();
 
             midi = FindObjectOfType<EzMidi.Connection>();
             scoreStatus = new ScoreStatus(midi, layout);
@@ -112,8 +108,6 @@ namespace NoteQuest
 
             if (filePicker != null && filePicker.activeSelf)
                 filePicker.SetActive(false);
-
-            InitScoreMode();
 
             scoreMode.SetActive(true);
             layout.gameObject.SetActive(true);
