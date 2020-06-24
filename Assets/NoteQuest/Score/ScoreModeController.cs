@@ -29,6 +29,9 @@ namespace NoteQuest
 
         void Awake()
         {
+            InitFilePicker();
+            InitScoreMode();
+
             ShowFilePicker();
         }
 
@@ -45,27 +48,18 @@ namespace NoteQuest
         {
             if (activeState == State.Picker) return;
 
-            InitFilePicker();
-
-            if (!filePicker.activeSelf)
-                filePicker.SetActive(true);
-
-            activeState = State.Picker;
-        }
-
-        void ReturnToPicker()
-        {
             scoreMode.SetActive(false);
             layout.gameObject.SetActive(false);
-            
-            ShowFilePicker();
+            filePicker.SetActive(true);
+
+            activeState = State.Picker;
         }
 
         private void InitFilePicker()
         {
             if (filePicker == null)
             {
-                filePicker = GameObject.Instantiate(scorePickerPrefab);
+                filePicker = GameObject.Instantiate(scorePickerPrefab, this.transform);
                 var picker = filePicker.GetComponent<FileSystemScorePicker>();
                 picker.selection += OnScoreSelected;
             }
@@ -76,7 +70,7 @@ namespace NoteQuest
             if (scoreMode != null)
                 return;
 
-            scoreMode = GameObject.Instantiate(scoreModePrefab);
+            scoreMode = GameObject.Instantiate(scoreModePrefab, this.transform);
 
             var scoreModeTransform = scoreMode.transform;
             noteText = scoreModeTransform.Find("CurrentNotes").GetComponent<TextMeshProUGUI>();
@@ -92,7 +86,7 @@ namespace NoteQuest
             eventTrigger = scoreModeTransform.Find("Back").GetComponent<EventTrigger>();
             entry = new EventTrigger.Entry();
             entry.eventID = EventTriggerType.PointerClick;
-            entry.callback.AddListener((data) => { ReturnToPicker(); });
+            entry.callback.AddListener((data) => { ShowFilePicker(); });
             eventTrigger.triggers.Add(entry);
 
             var layoutObj = GameObject.Instantiate(layoutPrefab, this.transform);

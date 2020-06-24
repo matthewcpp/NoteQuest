@@ -7,15 +7,13 @@ namespace NoteQuest
 {
     public class ArcadeMode : MonoBehaviour
     {
-        [SerializeField] GameObject staffPrefab;
-        [SerializeField] EzMidi.Connection midi;
-
+        EzMidi.Connection midi;
         ArcadeStaff arcadeStaff;
 
         private void Awake()
         {
-            var staffObj = GameObject.Instantiate(staffPrefab, this.transform);
-            arcadeStaff = staffObj.GetComponent<ArcadeStaff>();
+            midi = FindObjectOfType<EzMidi.Connection>();
+            arcadeStaff = transform.Find("Staff").GetComponent<ArcadeStaff>();
         }
 
         GameObject activeObject;

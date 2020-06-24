@@ -323,7 +323,7 @@ GameObject:
   - component: {fileID: 611031675384878000}
   - component: {fileID: 611031675384878003}
   - component: {fileID: 611031675384878002}
-  - component: {fileID: 611031675384878001}
+  - component: {fileID: 215003374969610703}
   m_Layer: 5
   m_Name: Streak
   m_TagString: Untagged
@@ -389,7 +389,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &611031675384878001
+--- !u!114 &215003374969610703
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -401,4 +401,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bfe36d9b15921c44bb9da9f7ff5eef3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: {fileID: 611031674339680576}
+  text: {fileID: 0}
