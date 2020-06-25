@@ -205,21 +205,26 @@ namespace NoteQuest
             var minX = -viewWidth / 2.0f;
 
             const float referenceStaffHeight = 2.25f;
-            float scaleValue = rectTransform.rect.height / referenceStaffHeight;
+            float scaleFactor, staffWidth;
 
             if (style == Style.Scrolling)
             {
-                arcadeStaff.transform.position = new Vector3(minX + (viewWidth * 0.1f), 0.0f, 0.0f);
-                arcadeStaff.staffWidth = (viewWidth * 0.8f) * (1.0f / scaleValue);
-                arcadeStaff.transform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
+                float heightRatio = aspect >= 1.0f ? 0.1f : 0.08f;
+                
+                scaleFactor = (viewHeight * heightRatio) / referenceStaffHeight;
+                staffWidth = (viewWidth * 0.8f)/ scaleFactor;
             }
             else
             {
-                const float staticWidth = 5.0f;
-                arcadeStaff.transform.position = new Vector3(-staticWidth / 2.0f, 0.0f, 0.0f);
-                arcadeStaff.staffWidth = staticWidth * (1.0f / scaleValue);
-                arcadeStaff.transform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
+                float widthRatio = aspect >= 1.0f ? 0.4f : 0.6f;
+                float heightRatio = aspect >= 1.0f ? 0.3f : 0.15f;
+                scaleFactor = (viewHeight * heightRatio) / referenceStaffHeight;
+                staffWidth = (viewWidth * widthRatio)/ scaleFactor;
             }
+            
+            arcadeStaff.transform.position = new Vector3(-staffWidth * scaleFactor / 2.0f, -scaleFactor - referenceStaffHeight / 2.0f, 0.0f);
+            arcadeStaff.staffWidth = staffWidth;
+            arcadeStaff.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
         }
     }
 
