@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/NoteQuest/NoteQuest.unity
+    guid: 61b81478241d2254d92d67991f605587
   m_configObjects: {}

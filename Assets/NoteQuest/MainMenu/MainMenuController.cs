@@ -7,26 +7,38 @@ public class MainMenuController : MonoBehaviour
 {
     [SerializeField] ArcadeModeController arcadeModeController;
     [SerializeField] ScoreModeController scoreModeController;
+    [SerializeField] SettingsController settingsController;
     [SerializeField] GameObject mainMenu;
 
+    private GameObject activeController;
+    
     public void EnterScoreMode()
     {
         mainMenu.SetActive(false);
-        scoreModeController.gameObject.SetActive(true);
+        activeController = scoreModeController.gameObject;
+        activeController.SetActive(true);
     }
 
     public void EnterArcadeMode()
     {
         mainMenu.SetActive(false);
-        arcadeModeController.gameObject.SetActive(true);
+        activeController = arcadeModeController.gameObject;
+        activeController.SetActive(true);
+    }
+
+    public void EnterSettingsMode()
+    {
+        mainMenu.SetActive(false);
+        activeController = settingsController.gameObject;
+        activeController.SetActive(true);
     }
 
     public void Update()
     {
-        if (mainMenu.activeSelf)
-            return;
-
-        if (!arcadeModeController.gameObject.activeSelf && !scoreModeController.gameObject.activeSelf)
+        if (activeController != null && !activeController.activeSelf)
+        {
             mainMenu.SetActive(true);
+            activeController = null;
+        }
     }
 }

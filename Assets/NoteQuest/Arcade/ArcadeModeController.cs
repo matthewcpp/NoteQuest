@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using TMPro;
-using UnityEditor.UI;
 
 namespace NoteQuest
 {
@@ -14,7 +12,6 @@ namespace NoteQuest
 
         ArcadeMode arcadeMode;
         GameObject arcadeModeUI;
-
 
         EzMidi.Connection midi;
         void Start()
