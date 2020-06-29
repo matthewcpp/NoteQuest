@@ -7,8 +7,7 @@ namespace NoteQuest
 {
     public class Streak : MonoBehaviour
     {
-        [SerializeField] TextMeshProUGUI text;
-
+        TextMeshProUGUI text;
         AnimationCurve animationCurve;
         float t = 0.0f;
 
@@ -24,6 +23,7 @@ namespace NoteQuest
         private void Awake()
         {
             animationCurve = AnimationCurve.Linear(0.0f, 1.0f, pulseSpeed, pulseAmount);
+            text = transform.Find("Text").GetComponent<TextMeshProUGUI>();
         }
 
         // Update is called once per frame

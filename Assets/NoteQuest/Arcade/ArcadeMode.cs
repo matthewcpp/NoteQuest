@@ -7,15 +7,13 @@ namespace NoteQuest
 {
     public class ArcadeMode : MonoBehaviour
     {
-        [SerializeField] GameObject staffPrefab;
-        [SerializeField] EzMidi.Connection midi;
-
+        EzMidi.Connection midi;
         ArcadeStaff arcadeStaff;
 
         private void Awake()
         {
-            var staffObj = GameObject.Instantiate(staffPrefab, this.transform);
-            arcadeStaff = staffObj.GetComponent<ArcadeStaff>();
+            midi = FindObjectOfType<EzMidi.Connection>();
+            arcadeStaff = transform.Find("Staff").GetComponent<ArcadeStaff>();
         }
 
         GameObject activeObject;
@@ -61,8 +59,9 @@ namespace NoteQuest
             { ABC.Clef.Bass, new PitchMinMax(ABC.Pitch.C2, ABC.Pitch.C4)},
         };
 
+        const float defaultSecondsToAnswer = 3.0f;
         public float secondsToAnswer { get => _secondsToAnswer; set { SetSecondsToAnswer(value); } }
-        private float _secondsToAnswer = 2.0f;
+        private float _secondsToAnswer = defaultSecondsToAnswer;
         private void SetSecondsToAnswer(float time)
         {
             _secondsToAnswer = time;
@@ -71,10 +70,26 @@ namespace NoteQuest
 
         public ABC.Duration currentItem { get; private set; }
 
-        private void Start()
+        void Start()
         {
-            secondsToAnswer = 2.0f;
-            style = Style.Scrolling;
+            style = Style.Static;
+            ResetArcade();
+        }
+
+        void OnDisable()
+        {
+            midi.NoteOn -= OnKeyDown;
+        }
+
+        public void ResetArcade()
+        {
+            currentItem = null;
+            total = 0;
+            corret = 0;
+            streak = 0;
+
+            arcadeStaff.ResetStaff();
+            secondsToAnswer = defaultSecondsToAnswer;
 
             arcadeStaff.onShredNote += OnShredNote;
             activeObject = arcadeStaff.SpawnNote(GetNextNote(), Vector3.left);
@@ -190,21 +205,26 @@ namespace NoteQuest
             var minX = -viewWidth / 2.0f;
 
             const float referenceStaffHeight = 2.25f;
-            float scaleValue = rectTransform.rect.height / referenceStaffHeight;
+            float scaleFactor, staffWidth;
 
             if (style == Style.Scrolling)
             {
-                arcadeStaff.transform.position = new Vector3(minX + (viewWidth * 0.1f), 0.0f, 0.0f);
-                arcadeStaff.staffWidth = (viewWidth * 0.8f) * (1.0f / scaleValue);
-                arcadeStaff.transform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
+                float heightRatio = aspect >= 1.0f ? 0.1f : 0.08f;
+                
+                scaleFactor = (viewHeight * heightRatio) / referenceStaffHeight;
+                staffWidth = (viewWidth * 0.8f)/ scaleFactor;
             }
             else
             {
-                const float staticWidth = 5.0f;
-                arcadeStaff.transform.position = new Vector3(-staticWidth / 2.0f, 0.0f, 0.0f);
-                arcadeStaff.staffWidth = staticWidth * (1.0f / scaleValue);
-                arcadeStaff.transform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
+                float widthRatio = aspect >= 1.0f ? 0.4f : 0.6f;
+                float heightRatio = aspect >= 1.0f ? 0.3f : 0.15f;
+                scaleFactor = (viewHeight * heightRatio) / referenceStaffHeight;
+                staffWidth = (viewWidth * widthRatio)/ scaleFactor;
             }
+            
+            arcadeStaff.transform.position = new Vector3(-staffWidth * scaleFactor / 2.0f, -scaleFactor - referenceStaffHeight / 2.0f, 0.0f);
+            arcadeStaff.staffWidth = staffWidth;
+            arcadeStaff.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
         }
     }
 

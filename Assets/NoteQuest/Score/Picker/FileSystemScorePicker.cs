@@ -13,12 +13,11 @@ namespace NoteQuest
         [SerializeField] GameObject directoryItemPrefab;
         [SerializeField] GameObject fileItemPrefab;
 
-        const string rootDirectory = "D:/temp/Scores";
-
         private Transform items;
         private TextMeshProUGUI currentPathText;
 
         public string currentDirectory { get; private set; }
+        private string homePath;
 
         List<ScorePickerItem> directoryItemPool = new List<ScorePickerItem>();
         List<ScorePickerItem> fileItemPool = new List<ScorePickerItem>();
@@ -30,6 +29,7 @@ namespace NoteQuest
 
         void Awake()
         {
+            homePath = Path.Combine(Application.streamingAssetsPath, "Scores");
             items = this.transform.Find("Items");
             currentPathText = GetComponentInChildren<TextMeshProUGUI>();
         }
@@ -41,20 +41,28 @@ namespace NoteQuest
 
         void ListCurrentDirectory()
         {
-            currentPathText.text = currentDirectory;
+            currentPathText.text = currentDirectory.Substring(homePath.Length);
             
             Clear();
 
             foreach (var directory in Directory.EnumerateDirectories(currentDirectory))
-                AddItem(ScorePickerItem.Type.Directory, directory.Substring(directory.LastIndexOf(Path.DirectorySeparatorChar) + 1));
+            {
+                var directoryName = directory.Substring(directory.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+                if (directoryName[0] == '.') continue;
+                AddItem(ScorePickerItem.Type.Directory, directoryName);
+            }
 
             foreach (var file in Directory.EnumerateFiles(currentDirectory, "*.abc"))
-                AddItem(ScorePickerItem.Type.File, file.Substring(file.LastIndexOf(Path.DirectorySeparatorChar) + 1));
+            {
+                var fileName = file.Substring(file.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+                if (fileName[0] == '.') continue;
+                AddItem(ScorePickerItem.Type.File, fileName);
+            }
         }
 
         public void NavigateUp()
         {
-            if (currentDirectory == rootDirectory)
+            if (currentDirectory == Application.streamingAssetsPath)
                 return;
 
             currentDirectory = Path.GetFullPath(Path.Combine(currentDirectory, ".."));
@@ -63,7 +71,7 @@ namespace NoteQuest
 
         public void NavigateHome()
         {
-            currentDirectory = rootDirectory;
+            currentDirectory = homePath + Path.DirectorySeparatorChar;
             ListCurrentDirectory();
         }
 

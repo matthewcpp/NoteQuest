@@ -9,7 +9,7 @@ namespace NoteQuest
         public EzMidi.Connection midiConnection;
         public TsfUnity.TinySoundFont tsf;
 
-        int soundfontPreset { get; set; } = 0;
+        public int soundfontPreset { get; set; } = 0;
 
         private void Start()
         {

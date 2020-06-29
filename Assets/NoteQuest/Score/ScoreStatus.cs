@@ -6,12 +6,11 @@ using System.IO;
 
 namespace NoteQuest
 {
-    public class ScoreMode : MonoBehaviour
+    public class ScoreStatus
     {
-        [SerializeField] GameObject layoutPrefab;
-        [SerializeField] EzMidi.Connection midi;
 
-        public ABCUnity.Layout layout { get; private set; }
+        EzMidi.Connection midi;
+        ABCUnity.Layout layout;
 
         List<VoiceStatus> voiceStatuses;
 
@@ -20,15 +19,20 @@ namespace NoteQuest
 
         public int streak { get; private set; } = 0;
 
-        void Awake()
+        public ScoreStatus(EzMidi.Connection midi, ABCUnity.Layout layout)
         {
-            var layoutObj = GameObject.Instantiate(layoutPrefab, this.transform);
-            layout = layoutObj.GetComponent<ABCUnity.Layout>();
+            this.midi = midi;
+            this.midi.NoteOn += OnKeyDown;
 
-            layout.onLoaded += OnTuneLoaded;
+            this.layout = layout;
+            this.layout.onLoaded += OnTuneLoaded;
         }
 
-        public ABC.Tune tune { get { return layout.tune; } }
+        public void UnbindCallbacks()
+        {
+            this.midi.NoteOn -= OnKeyDown;
+            this.layout.onLoaded -= OnTuneLoaded;
+        }
 
         public ABC.Item GetActiveVoiceItem(int index)
         {
@@ -37,27 +41,6 @@ namespace NoteQuest
             else
                 return null;
         }
-
-        #region MonoBehaviour Events
-
-        private void Start()
-        {
-            UpdateLayout();
-            midi.NoteOn += OnKeyDown;
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.R))
-                ResetScore();
-        }
-
-        private void OnEnable()
-        {
-            UpdateLayout();
-        }
-
-        #endregion
 
         private void OnTuneLoaded(ABC.Tune tune)
         {
@@ -72,18 +55,6 @@ namespace NoteQuest
             }
 
             UpdateStatus();
-        }
-
-        void UpdateLayout()
-        {
-            var orthoSize = Camera.main.orthographicSize;
-            var aspect = Camera.main.aspect;
-            var orthoWidth = (orthoSize * 2.0f) * aspect;
-
-            layout.layoutScale = 0.25f;
-            var layoutTransform = layout.GetComponent<RectTransform>();
-            layoutTransform.position = new Vector3(0.1f, orthoSize - 1.0f, 0.0f);
-            layoutTransform.sizeDelta = new Vector2(orthoWidth, orthoSize * 2.0f - 0.2f);
         }
 
         private void UpdateStatus()

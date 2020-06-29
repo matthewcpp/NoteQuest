@@ -63,3 +63,8 @@ Assets/TextMesh Pro/
 Assets/TextMesh Pro.meta
 
 .idea
+
+Assets/StreamingAssets/Scores
+Assets/StreamingAssets/Scores.meta
+
+.DS_Store
