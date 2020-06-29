@@ -68,7 +68,6 @@ namespace NoteQuest.ScorePicker
         [Serializable]
         class DirectoryListing
         {
-            public string path;
             public string[] files;
             public string[] directories;
         }
@@ -76,18 +75,42 @@ namespace NoteQuest.ScorePicker
         public IEnumerator ListDirectory(string path)
         {
             itemList.Clear();
-            var url = UnityWebRequest.EscapeURL($"http://localhost:3000/directory?path={path}");
-            using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
+            var urlPath = UnityWebRequest.EscapeURL(path);
+            using (UnityWebRequest webRequest = UnityWebRequest.Get($"http://localhost:3000/directory?path={urlPath}"))
             {
+                webRequest.SetRequestHeader("Authorization", "Token test");
                 yield return webRequest.SendWebRequest();
-                var directoryListing = JsonUtility.FromJson<DirectoryListing>(webRequest.downloadHandler.text);
+
+                if (webRequest.responseCode == 200)
+                {
+                    var directoryListing = JsonUtility.FromJson<DirectoryListing>(webRequest.downloadHandler.text);
+
+                    foreach (var directory in directoryListing.directories)
+                        itemList.AddItem(ItemType.Directory, directory);
+
+                    foreach (var file in directoryListing.files)
+                        itemList.AddItem(ItemType.File, file);
+                }
+                else
+                {
+                    Debug.Log($"Request Error {webRequest.responseCode}: ${webRequest.downloadHandler.text}");
+                }
             }
         }
         
         public IEnumerator GetFileContents(string path, FilePickedEvent callbacks)
         {
-            
-            yield return null;
+            var urlPath = UnityWebRequest.EscapeURL(path);
+            using (UnityWebRequest webRequest = UnityWebRequest.Get($"http://localhost:3000/file?path={urlPath}"))
+            {
+                webRequest.SetRequestHeader("Authorization", "Token test");
+                yield return webRequest.SendWebRequest();
+
+                if (webRequest.responseCode == 200)
+                    callbacks?.Invoke(path, webRequest.downloadHandler.text);
+                else
+                    Debug.Log($"Request Error {webRequest.responseCode}: ${webRequest.downloadHandler.text}");
+            }
         }
     }
 }

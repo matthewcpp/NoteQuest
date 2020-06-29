@@ -25,7 +25,7 @@ namespace NoteQuest.ScorePicker
             itemList = GetComponentInChildren<ItemList>();
             itemList.onItemPick += OnItemClick;
             currentPathText = GetComponentInChildren<TextMeshProUGUI>();
-            source = new FileSystemSource(itemList);
+            source = new NoteQuestServerSource(itemList);
             NavigateHome();
         }
 
