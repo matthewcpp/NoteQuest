@@ -59,8 +59,8 @@ namespace NoteQuest
 
         private void InitPicker()
         {
-            var picker = filePicker.GetComponent<FileSystemScorePicker>();
-            picker.selection += OnScoreSelected;
+            var picker = filePicker.GetComponent<ScorePicker.Picker>();
+            picker.filePicked += OnScoreSelected;
 
             var eventTrigger = picker.transform.Find("Back").GetComponent<EventTrigger>();
             EventTrigger.Entry entry = new EventTrigger.Entry();
@@ -94,11 +94,11 @@ namespace NoteQuest
             UpdateLayout();
         }
 
-        public void OnScoreSelected(string selection)
+        public void OnScoreSelected(string path, string contents)
         {
-            Debug.Log($"ScoreSelected {selection}");
+            Debug.Log($"ScoreSelected {path}");
             ShowScore();
-            layout.LoadFile(selection);
+            layout.LoadString(contents);
             titleText.text = layout.tune.title;
         }
 
