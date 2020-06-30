@@ -16,6 +16,8 @@ namespace NoteQuest.ScorePicker
         private TextMeshProUGUI currentPathText;
         private Source source;
 
+        private static readonly Color activeColor = new Color(1.0f, 0.78f, 0.01f, 1.0f);
+
         public string currentDirectory { get; private set; }
         
         public event FilePickedEvent filePicked;
@@ -25,7 +27,7 @@ namespace NoteQuest.ScorePicker
             itemList = GetComponentInChildren<ItemList>();
             itemList.onItemPick += OnItemClick;
             currentPathText = GetComponentInChildren<TextMeshProUGUI>();
-            source = new NoteQuestServerSource(itemList);
+            source = new FileSystemSource(itemList);
             NavigateHome();
         }
 
@@ -40,7 +42,16 @@ namespace NoteQuest.ScorePicker
             if (currentDirectory == string.Empty)
                 return;
 
-            currentDirectory = Path.GetFullPath(Path.Combine(currentDirectory, ".."));
+            var directories = currentDirectory.Split(Path.PathSeparator);
+            if (directories.Length > 1)
+            {
+                var parts = new string[directories.Length - 1];
+                Array.Copy(directories, parts, parts.Length);
+                currentDirectory = string.Join(new string(Path.PathSeparator, 1), parts);
+            }
+            else
+                currentDirectory = string.Empty;
+
             ListCurrentDirectory();
         }
 
@@ -48,6 +59,36 @@ namespace NoteQuest.ScorePicker
         {
             currentDirectory = string.Empty;
             ListCurrentDirectory();
+        }
+
+        public void SetFileSystemSource()
+        {
+            var fileSystem = this.transform.Find("FileSystemSource").GetComponent<Image>();
+            if (fileSystem.color == activeColor)
+                return;
+            
+            fileSystem.color = activeColor;
+            
+            var server = this.transform.Find("ServerSource").GetComponent<Image>();
+            server.color = Color.black;
+            
+            source = new FileSystemSource(this.itemList);
+            NavigateHome();
+        }
+
+        public void SetServerSource()
+        {
+            var server = this.transform.Find("ServerSource").GetComponent<Image>();
+            if (server.color == activeColor)
+                return;
+            
+            server.color = activeColor;
+            
+            var fileSystem = this.transform.Find("FileSystemSource").GetComponent<Image>();
+            fileSystem.color = Color.black;
+            
+            source = new NoteQuestServerSource(this.itemList);
+            NavigateHome();
         }
 
         void OnItemClick(ScorePickerItem item)
