@@ -1,0 +1,4 @@
+{
+	"serverEndpoint": "http://localhost:3000",
+	"secretToken": "test"
+}

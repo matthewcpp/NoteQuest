@@ -58,10 +58,19 @@ namespace NoteQuest.ScorePicker
 
     class NoteQuestServerSource : Source
     {
-        private ItemList itemList;
-        
-        public NoteQuestServerSource(ItemList itemList)
+        [Serializable]
+        public class Settings
         {
+            public string serverEndpoint;
+            public string secretToken;
+        }
+        
+        private readonly Settings settings;
+        private readonly ItemList itemList;
+        
+        public NoteQuestServerSource(string settingsPath, ItemList itemList)
+        {
+            this.settings = JsonUtility.FromJson<NoteQuestServerSource.Settings>(File.ReadAllText(settingsPath));
             this.itemList = itemList;
         }
 
@@ -76,9 +85,9 @@ namespace NoteQuest.ScorePicker
         {
             itemList.Clear();
             var urlPath = UnityWebRequest.EscapeURL(path);
-            using (UnityWebRequest webRequest = UnityWebRequest.Get($"http://localhost:3000/directory?path={urlPath}"))
+            using (UnityWebRequest webRequest = UnityWebRequest.Get($"{settings.serverEndpoint}/directory?path={urlPath}"))
             {
-                webRequest.SetRequestHeader("Authorization", "Token test");
+                webRequest.SetRequestHeader("Authorization", $"Token {settings.secretToken}");
                 yield return webRequest.SendWebRequest();
 
                 if (webRequest.responseCode == 200)

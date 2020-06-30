@@ -14,7 +14,10 @@ namespace NoteQuest.ScorePicker
 
         private Transform items;
         private TextMeshProUGUI currentPathText;
-        private Source source;
+        
+        private FileSystemSource fileSystemSource;
+        private NoteQuestServerSource serverSource;
+        private Source activeSource;
 
         private static readonly Color activeColor = new Color(1.0f, 0.78f, 0.01f, 1.0f);
 
@@ -27,14 +30,23 @@ namespace NoteQuest.ScorePicker
             itemList = GetComponentInChildren<ItemList>();
             itemList.onItemPick += OnItemClick;
             currentPathText = GetComponentInChildren<TextMeshProUGUI>();
-            source = new FileSystemSource(itemList);
+
+            fileSystemSource = new FileSystemSource(itemList);
+            var settingsPath = Path.Combine(Application.streamingAssetsPath, "ServerSettings.json");
+            if (File.Exists(settingsPath))
+                serverSource = new NoteQuestServerSource(settingsPath, itemList);
+            else
+                GameObject.Destroy(transform.Find("ServerSource").gameObject);
+            
+            activeSource = fileSystemSource;
+            
             NavigateHome();
         }
 
         void ListCurrentDirectory()
         {
             currentPathText.text = currentDirectory;
-            StartCoroutine(source.ListDirectory(currentDirectory));
+            StartCoroutine(activeSource.ListDirectory(currentDirectory));
         }
 
         public void NavigateUp()
@@ -71,8 +83,8 @@ namespace NoteQuest.ScorePicker
             
             var server = this.transform.Find("ServerSource").GetComponent<Image>();
             server.color = Color.black;
-            
-            source = new FileSystemSource(this.itemList);
+
+            activeSource = fileSystemSource;
             NavigateHome();
         }
 
@@ -86,8 +98,9 @@ namespace NoteQuest.ScorePicker
             
             var fileSystem = this.transform.Find("FileSystemSource").GetComponent<Image>();
             fileSystem.color = Color.black;
+
+            activeSource = serverSource;
             
-            source = new NoteQuestServerSource(this.itemList);
             NavigateHome();
         }
 
@@ -102,10 +115,9 @@ namespace NoteQuest.ScorePicker
             else
             {
                 var filePath = Path.Combine(currentDirectory, item.text);
-                StartCoroutine(source.GetFileContents(filePath, filePicked));
+                StartCoroutine(activeSource.GetFileContents(filePath, filePicked));
             }
         }
-
     }
 }
 
