@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace NoteQuest
+namespace NoteQuest.ScorePicker
 {
     public class ScorePickerItem : MonoBehaviour
     {
-        public enum Type
-        {
-            Directory, File
-        }
 
-        public Type type;
+        public ItemType type;
 
         public string text {
             get { return GetComponentInChildren<TextMeshProUGUI>().text; } 
