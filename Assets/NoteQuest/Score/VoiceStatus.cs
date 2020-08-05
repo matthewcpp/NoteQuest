@@ -63,12 +63,11 @@ namespace NoteQuest
         public void NextBeatItem()
         {
             beatNoteIndex = Math.Min(beatNoteIndex + 1, beat.items.Count);
+            remainingNotes.Clear();
+            allNotes.Clear();
 
             if (beatNoteIndex < beat.items.Count)
             {
-                remainingNotes.Clear();
-                allNotes.Clear();
-
                 beatNote = beat.items[beatNoteIndex];
                 AbcToMidi.Convert(beatNote as ABC.Duration, allNotes);
 
@@ -77,6 +76,11 @@ namespace NoteQuest
             }
         }
 
-        public bool isReadyForNextBeat { get { return remainingNotes.Count == 0 && beatNoteIndex == beat.items.Count; } }
+        private bool BeatItemIsRest()
+        {
+            return beatNote != null && (beatNote.type == ABC.Item.Type.Rest || beatNote.type == ABC.Item.Type.MultiMeasureRest);
+        }
+
+        public bool isReadyForNextBeat { get { return BeatItemIsRest() || (remainingNotes.Count == 0 && beatNoteIndex == beat.items.Count); } }
     }
 }

@@ -44,6 +44,8 @@ namespace NoteQuest
 
         private void OnTuneLoaded(ABC.Tune tune)
         {
+            ResetScoreValues();
+
             voiceStatuses = new List<VoiceStatus>();
 
             for (int i  = 0; i < tune.voices.Count; i++)
@@ -74,13 +76,18 @@ namespace NoteQuest
             }
         }
 
-        public void ResetScore()
+        private void ResetScoreValues()
         {
             allowedNotes.Clear();
             complete = false;
             currentMeasure = 0;
             currentBeat = 1;
             streak = 0;
+        }
+
+        public void ResetScore()
+        {
+            ResetScoreValues();
 
             foreach (var voiceStatus in voiceStatuses)
             {
@@ -150,7 +157,7 @@ namespace NoteQuest
             // This method will check that all notes that should be pressed for this beat item have been lifted and we can proceed to the next item
             foreach (var note in midi.notesOn)
             {
-                if (!allowedNotes.Contains(note))
+                if (allowedNotes.Count > 0 && !allowedNotes.Contains(note))
                     return false;
             }
 
